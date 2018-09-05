@@ -1,4 +1,4 @@
-# AWS_RestAPI
+# AWS_RestAPI_IOT
 Python script for making REST API calls to AWS IoT.
 
 Example:
