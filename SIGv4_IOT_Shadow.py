@@ -16,16 +16,16 @@
 #
 
 # AWS Version 4 signing example
-
 # See: http://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html
+
 # This version makes a GET request and passes the signature
 # in the Authorization header.
-import sys, os, base64, datetime, hashlib, hmac 
-import requests # pip install requests
+import sys, os, base64, datetime, hashlib, hmac, json, requests
 
 # ************* REQUEST VALUES *************
 method = 'GET'
 service = 'iotdata'
+thing_name = 'rPi'
 host = 'a2e3cvdgunjnha.iot.ap-northeast-1.amazonaws.com'
 region = 'ap-northeast-1'
 endpoint = 'https://a2e3cvdgunjnha.iot.ap-northeast-1.amazonaws.com'
@@ -57,7 +57,6 @@ t = datetime.datetime.utcnow()
 amzdate = t.strftime('%Y%m%dT%H%M%SZ')
 datestamp = t.strftime('%Y%m%d') # Date w/o time, used in credential scope
 
-
 # ************* TASK 1: CREATE A CANONICAL REQUEST *************
 # http://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html
 
@@ -65,7 +64,7 @@ datestamp = t.strftime('%Y%m%d') # Date w/o time, used in credential scope
 
 # Step 2: Create canonical URI--the part of the URI from domain to query 
 # string (use '/' if no path)
-canonical_uri = '/things/rPi/shadow' 
+canonical_uri = '/things/' + thing_name + '/shadow' 
 
 # Step 3: Create the canonical query string. In this example (a GET request),
 # request parameters are in the query string. Query string values must
@@ -106,7 +105,6 @@ signing_key = getSignatureKey(secret_key, datestamp, region, service)
 # Sign the string_to_sign using the signing_key
 signature = hmac.new(signing_key, (string_to_sign).encode('utf-8'), hashlib.sha256).hexdigest()
 
-
 # ************* TASK 4: ADD SIGNING INFORMATION TO THE REQUEST *************
 # The signing information can be either in a query string value or in 
 # a header named Authorization. This code shows how to use a header.
@@ -120,7 +118,6 @@ authorization_header = algorithm + ' ' + 'Credential=' + access_key + '/' + cred
 # Python note: The 'host' header is added automatically by the Python 'requests' library.
 headers = {'content-type':content_type,'x-amz-date':amzdate, 'Authorization':authorization_header}
 
-
 # ************* SEND THE REQUEST *************
 request_url = endpoint + canonical_uri
 
@@ -131,4 +128,11 @@ r = requests.get(request_url, headers=headers)
 
 print('\nRESPONSE++++++++++++++++++++++++++++++++++++')
 print('Response code: %d\n' % r.status_code)
-print(r.text)
+#print(r.text)
+
+json_data = json.loads(r.text)
+
+print "Pressure : " + str(json_data['state']['reported']['temperature']) + '\n'
+print "Temperature :" + str(json_data['state']['reported']['pressure']) + '\n'
+print "Humidity :" + str(json_data['state']['reported']['humidity']) + '\n'
+
