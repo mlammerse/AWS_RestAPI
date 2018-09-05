@@ -1,8 +1,6 @@
 # AWS_RestAPI
 Python script for making REST API calls to AWS IoT.
 
-python SIGv4_IOT_Shadow.py
-
 Example:
 
 ```
@@ -18,6 +16,8 @@ Response code: 200
 {"timestamp":1529799929},"humidity":{"timestamp":1529799929},"pressure":> >>>>>{"timestamp":1529799929}}},"version":176,"timestamp":1536132588}
 $
 ```
+
+Based on https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html.
 
 
 
